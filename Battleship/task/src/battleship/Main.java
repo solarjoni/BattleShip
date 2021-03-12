@@ -18,7 +18,7 @@
 package battleship;
 
 import java.io.*;
-import java.util.Arrays;
+
 import java.util.Scanner;
 
 public class Main {
@@ -27,33 +27,116 @@ public class Main {
     static char hit = 'x';
     static char miss = 'M';
     static String newLine = "\n";
-    static char firstLetter;
-    static char secondLetter;
-    static char[][] bfArray = new char[10][10];
-    static char[] testArray = {'1', '2', '3', '4', '5'};
     static String notationUpper = "  1 2 3 4 5 6 7 8 9 10";
+    static private int shipLength;
+    static private int firstRowNumber;
+    static private int firstColNumber;
+    static private int secondRowNumber;
+    static private int secondColNumber;
+    static private int minRowNumber;
+    static private int minColNumber;
+    static private int maxRowNumber;
+    static private int maxColNumber;
+
+    public static int getMaxRowNumber() {
+        return maxRowNumber;
+    }
+
+    public static int getMaxColNumber() {
+        return maxColNumber;
+    }
+
+    public static void setMaxRowNumber(int maxRowNumber) {
+        Main.maxRowNumber = maxRowNumber;
+    }
+
+    public static void setMaxColNumber(int maxColNumber) {
+        Main.maxColNumber = maxColNumber;
+    }
+
+    public static void setMinRowNumber(int minRowNumber) {
+        Main.minRowNumber = minRowNumber;
+    }
+
+    public static void setMinColNumber(int minColNumber) {
+        Main.minColNumber = minColNumber;
+    }
+
+    public static int getMinRowNumber() {
+        return minRowNumber;
+    }
+
+    public static int getMinColNumber() {
+        return minColNumber;
+    }
+
+    public static int getFirstRowNumber() {
+        return firstRowNumber;
+    }
+
+    public static int getFirstColNumber() {
+        return firstColNumber;
+    }
+
+    public static int getSecondRowNumber() {
+        return secondRowNumber;
+    }
+
+    public static int getSecondColNumber() {
+        return secondColNumber;
+    }
+
+    public static void setFirstRowNumber(int firstRowNumber) {
+        Main.firstRowNumber = firstRowNumber;
+    }
+
+    public static void setFirstColNumber(int firstColNumber) {
+        Main.firstColNumber = firstColNumber;
+    }
+
+    public static void setSecondRowNumber(int secondRowNumber) {
+        Main.secondRowNumber = secondRowNumber;
+    }
+
+    public static void setSecondColNumber(int secondColNumber) {
+        Main.secondColNumber = secondColNumber;
+    }
+
+    public static int getShipLength() {
+        return shipLength;
+    }
+
+    public static void setShipLength(int shipLength) {
+        Main.shipLength = shipLength;
+    }
 
     public static void main(String[] args) throws IOException {
         // Write your code here
         BattleField newField = new BattleField("newone");
         composeBoard(newField);
         System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells):");
-        processPosition(newField, "Aircraft Carrier");
+        processAndFill(newField, "Aircraft Carrier");
         composeBoard(newField);
         System.out.println("\nEnter the coordinates of the Battleship (4 cells):");
-        processPosition(newField, "Battleship");
+        processAndFill(newField, "Battleship");
         composeBoard(newField);
-
+        System.out.println("\nEnter the coordinates of the Submarine (3 cells):");
+        processAndFill(newField, "Submarine");
+        composeBoard(newField);
+        System.out.println("\nEnter the coordinates of the Cruiser (3 cells):");
+        processAndFill(newField, "Cruiser");
+        composeBoard(newField);
+        System.out.println("\nEnter the coordinates of the Destroyer (2 cells):");
+        processAndFill(newField, "Destroyer");
+        composeBoard(newField);
 
     }
 
-    public static void processPosition(BattleField newField, String ship) throws IOException {
+    public static void processAndFill(BattleField newField, String ship) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
         FileWriter bf = new FileWriter("battlefield", true);
-
-
         // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Scanner input = new Scanner(System.in);
+        Scanner input = new Scanner(System.in); // For text use Scanner
         while (true) {
             try {
                 String[] stringsArray;
@@ -62,69 +145,127 @@ public class Main {
 
                 char firstLetter = stringsArray[0].charAt(0);
                 char secondLetter = stringsArray[1].charAt(0);
-                int firstRowNumber = (int) firstLetter - 65;
-                int secondRowNumber = (int) secondLetter - 65;
-                int firstColNumber = Integer.parseInt(stringsArray[0].substring(1));
-                int secondColNumber = Integer.parseInt(stringsArray[1].substring(1));
+                setFirstRowNumber((int) firstLetter - 65);
+                setSecondRowNumber((int) secondLetter - 65);
+                setFirstColNumber(Integer.parseInt(stringsArray[0].substring(1)));
+                setSecondColNumber(Integer.parseInt(stringsArray[1].substring(1)));
 
-                System.out.print(firstRowNumber);
-                System.out.println(firstColNumber);
-                System.out.print(secondRowNumber);
-                System.out.println(secondColNumber);
-                System.out.println(newField.battleField[firstRowNumber][firstColNumber]);
-                System.out.println(newField.battleField[secondRowNumber][secondColNumber]);
-
-
+                switch (ship) {
+                    case "Aircraft Carrier":
+                        setShipLength(5);
+                        break;
+                    case "Battleship":
+                        setShipLength(4);
+                        break;
+                    case "Submarine":
+                        setShipLength(3);
+                        break;
+                    case "Cruiser":
+                        setShipLength(3);
+                        break;
+                    case "Destroyer":
+                        setShipLength(2);
+                        break;
+                }
+                // Checks if input is correct
                 if (stringsArray.length == 2
                         && stringsArray[0].length() <= 3
                         && stringsArray[1].length() <= 3
-                        && '~' == newField.battleField[firstRowNumber][firstColNumber]
-                        && firstRowNumber >= 0
-                        && firstRowNumber <= 9
-                        && firstColNumber >= 1
-                        && firstColNumber <= 10
-                        && secondRowNumber >= 0
-                        && secondRowNumber <= 9
-                        && secondColNumber >= 1
-                        && secondColNumber <= 10
-
+                        &&
+                        (getFirstRowNumber() == getSecondRowNumber()
+                                || getFirstColNumber() == getSecondColNumber())
+                        && (getSecondRowNumber() - getFirstRowNumber() == getShipLength() - 1
+                        || getSecondColNumber() - getFirstColNumber() == getShipLength() - 1)
+                        // Its possible for a second number be less than first!
+                        && firstRowNumber >= 0 // is true anyway ?
+                        && getFirstRowNumber() <= 9
+                        && getFirstColNumber() >= 1
+                        && getFirstColNumber() <= 10
+                        && secondRowNumber >= 0 // is true anyway ?
+                        && getSecondRowNumber() <= 9
+                        && getSecondColNumber() >= 1
+                        && getSecondColNumber() <= 10
                 ) {
-                    switch (ship) {
-                        case "Aircraft Carrier":
-
-                            break;
-                        case "Battleship":
-                            break;
-                        case "Submarine":
-                            break;
-                        case "Cruiser":
-                            break;
-                        case "Destroyer":
-                            break;
+                    // Check if cells are available
+                    if (isSpaceAvailable(newField, getShipLength())) {
+                        // Need to break form while loop if everything ok: while(false)
+                        break;
+                    } else {
+                        System.out.println("Error. Space not available");
+                        // continue;
                     }
-                    break;
                 } else {
-                    System.out.println("Error");
+                    System.out.println("Error! Numbers not Ok");
                 }
             } catch (Exception e) {
-                System.out.println("Error" + e.getMessage());
+                System.out.println("Error " + e.getMessage());
             }
-
         }
+        // Inserts manual numbers into array
+        // newField.battleField[3][4] = cell;
+        // boardWriter.write(newField.battleField[3][4]);
+        // boardWriter.writeTo(bf);
 
-        // System.out.println(position);
-
-        newField.battleField[3][4] = cell;
-        boardWriter.write(newField.battleField[3][4]);
+        for (int row = getFirstRowNumber(); row <= getSecondRowNumber(); row++) {
+            for (int col = getFirstColNumber(); col <= getSecondColNumber(); col++) {
+                newField.battleField[row][col] = cell;
+                boardWriter.write(newField.battleField[row][col]);
+            }
+        }
         boardWriter.writeTo(bf);
         bf.close();
         boardWriter.close();
     }
 
+    public static boolean isSpaceAvailable(BattleField newField, int shipLength) {
+/*        System.out.println(shipLength);
+        System.out.print(getFirstRowNumber());
+        System.out.print(getFirstColNumber() + " ");
+        System.out.print(getSecondRowNumber());
+        System.out.println(getSecondColNumber());
+        System.out.print(newField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
+        System.out.println(newField.battleField[getSecondRowNumber()][getSecondColNumber()]);
+*/
+
+        if (getFirstColNumber() == 1) {
+            setMinColNumber(1);
+        } else {
+            setMinColNumber(getFirstColNumber() - 1);
+        }
+        if (getFirstRowNumber() == 0) {
+            setMinRowNumber(0);
+        } else {
+            setMinRowNumber(getFirstRowNumber() - 1);
+        }
+        if (getSecondRowNumber() == 9) {
+            setMaxRowNumber(9);
+        } else {
+            setMaxRowNumber(getSecondRowNumber() + 1);
+        }
+        if (getSecondColNumber() == 10) {
+            setMaxColNumber(10);
+        } else {
+            setMaxColNumber(getSecondColNumber() + 1);
+
+        }
+
+
+        for (int row = getMinRowNumber(); row <= getMaxRowNumber(); row++) {
+            for (int col = getMinColNumber(); col <= getMaxColNumber(); col++) {
+                // System.out.println(newField.battleField[row][col] + "***" + row + col);
+                if (newField.battleField[row][col] == cell) {
+                    return false;
+                }
+            }
+        }
+        return true;
+
+    }
+
     // Creates new board full of 'Fog of War'
     public static void composeBoard(BattleField newField) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield");
+        FileWriter bf = new FileWriter("battlefield"); // Implement name ask
         System.out.println(notationUpper);
         boardWriter.write(notationUpper);
         boardWriter.write(newLine);
@@ -147,6 +288,7 @@ public class Main {
         boardWriter.close();
     }
 }
+
 
 class BattleField {
     String name;
