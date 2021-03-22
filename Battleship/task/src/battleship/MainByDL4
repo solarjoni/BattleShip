@@ -1,0 +1,134 @@
+package battleship;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Write your code here
+        Scanner sc = new Scanner(System.in);
+        char[][] board = new char[10][10];
+        for(int x=0;x<board.length;x++)
+            Arrays.fill( board[x], '~' );
+        printBoard(board);
+
+        board = arrangeShips(board, sc, 5, "Aircraft Carrier");
+        printBoard(board);
+        board = arrangeShips(board, sc, 4, "Battleship");
+        printBoard(board);
+        board = arrangeShips(board, sc, 3, "Submarine");
+        printBoard(board);
+        board = arrangeShips(board, sc, 3, "Cruiser");
+        printBoard(board);
+        board = arrangeShips(board, sc, 2, "Destroyer");
+        printBoard(board);
+    }
+
+    public static void printBoard(char[][] board) {
+        System.out.print("  ");
+        for (int x = 1; x <= board[0].length; x++) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+        for (int x = 0; x < board.length; x++) {
+            System.out.print((char)(65 + x) + " ");
+            for (int y = 0; y < board[x].length; y++) {
+                System.out.print(board[x][y] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static int[] intSort(int num1, int num2) {
+        int[] result = {num1, num2};
+        Arrays.sort(result);
+        return result;
+    }
+
+    public static char[][] arrangeShips(char[][] board , Scanner sc, int length, String shipName) {
+        final int firstAscii = 65;
+        boolean success = false;
+        System.out.printf("Enter the coordinates of the %s (%d cells):%n", shipName, length);
+        while (!success) {
+            String[] input = sc.nextLine().trim().split("[ ]+");
+            try {
+                if (input.length == 2) {
+                    int[] b = intSort(input[0].toUpperCase().charAt(0) - firstAscii, input[1].toUpperCase().charAt(0) - firstAscii);
+                    int startRow = b[0];
+                    int endRow = b[1];
+                    b = intSort(Integer.parseInt(input[0].substring(1)) - 1, Integer.parseInt(input[1].substring(1)) - 1);
+                    int startColumn = b[0];
+                    int endColumn = b[1];
+
+                    if (startColumn < 0 || endColumn < 0 || startColumn > 9 || endColumn > 9 ||
+                            startRow < 0 || endRow < 0 || startRow > 9 || endRow > 9) {
+                        throw new NumberFormatException();
+                    }
+
+                    int columnDiff = Math.abs(startColumn - endColumn);
+                    int rowDiff = Math.abs(startRow - endRow);
+
+                    if (columnDiff == length - 1 ^ rowDiff == length - 1 && columnDiff == 0 ^ rowDiff == 0){
+                        if (columnDiff == 0) {
+                            if (!checkShipTooClose(board,startRow < endRow ? startRow : endRow, startColumn, false ,length))
+                                throw new Exception("Error! You placed it too close to another one. Try again:");
+                            for (int x = (startRow < endRow ? startRow : endRow); x <= (startRow > endRow ? startRow : endRow); x++) {
+                                board[x][startColumn] = 'O';
+                            }
+                        } else if (rowDiff == 0) {
+                            if (!checkShipTooClose(board, startRow, startColumn, true ,length))
+                                throw new Exception("Error! You placed it too close to another one. Try again:");
+                            Arrays.fill(board[startRow], startColumn, endColumn + 1, 'O');
+                        } else {
+                            throw new Exception("Error! Please content Programmer (arrangeShips)");
+                        }
+                        success = true;
+                    } else if ((startColumn != endColumn && startRow != endRow) || (startColumn == endColumn && startRow == endRow)){
+                        throw new NumberFormatException();
+                    } else if (columnDiff == 0 ^ rowDiff == 0 && columnDiff < length - 1 && rowDiff < length - 1){
+                        throw new NumberFormatException();
+                    } else if (columnDiff == 0 ^ rowDiff == 0 && columnDiff > length - 1 ^ rowDiff > length - 1) {
+                        throw new NumberFormatException();
+                    } else {
+                        System.out.println("failed");
+                    }
+                } else {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error! Wrong ship location! Try again:");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return board;
+    }
+
+    public static boolean checkShipTooClose(char[][] board,int positionX, int positionY, boolean sameRow ,int length) {
+        int rowAdd = sameRow ? 0 : 1;
+        int columnAdd = !sameRow ? 0 : 1;
+
+        for (int x = 0; x < length; x++) {
+            if (board[positionX + x * rowAdd][positionY + x * columnAdd] == 'O')
+                return false;
+            if (positionX - 1 + x * rowAdd > 0 ) {
+                if (board[positionX + x * rowAdd - 1][positionY + x * columnAdd] == 'O')
+                    return false;
+            }
+            if (positionY - 1 + x * columnAdd > 0 ) {
+                if (board[positionX + x * rowAdd][positionY + x * columnAdd - 1] == 'O')
+                    return false;
+            }
+            if (positionX + x * rowAdd + 1 <= 9) {
+                if (board[positionX + x * rowAdd + 1][positionY + x * columnAdd] == 'O')
+                    return false;
+            }
+            if (positionY + x * columnAdd + 1 <= 9 ) {
+                if (board[positionX + x * rowAdd][positionY + x * columnAdd + 1] == 'O')
+                    return false;
+            }
+        }
+        return true;
+    }
+
+}

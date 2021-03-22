@@ -1,6 +1,6 @@
 type: edu
 files:
-- name: src/battleship/Main.java
+- name: ../task/src/battleship/Main.java
   visible: true
   text: |
     package battleship;
@@ -12,7 +12,7 @@ files:
         }
     }
   learner_created: false
-- name: test/Tests.java
+- name: ../task/test/Tests.java
   visible: false
   text: |-
     import org.hyperskill.hstest.dynamic.input.DynamicTestingMethod;
@@ -450,6 +450,18 @@ files:
         }
     }
   learner_created: false
+- name: ../task/src/battleship/MainByDL4
+  visible: true
+  learner_created: true
+- name: ../task/src/battleship/MainOld
+  visible: true
+  learner_created: true
+- name: ../../battlefield
+  visible: true
+  learner_created: true
+- name: ../task/src/battleship/MainByRomanKukin
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/125/stages/664/implement#comment
 status: Unchecked
 record: -1
