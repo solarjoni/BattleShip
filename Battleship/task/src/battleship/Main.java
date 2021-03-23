@@ -23,7 +23,7 @@ import java.util.Scanner;
 
 public class Main {
     static String fogOfWar = "~";
-    static String cell = "o";
+    static String cell = "O";
     static String hit = "x";
     static String miss = "M";
     static String newLine = "\n";
@@ -113,24 +113,29 @@ public class Main {
         // Write your code here
         BattleField newField = new BattleField("newone");
         composeBoard(newField);
-        System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells):");
+        System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells): ");
         processAndFill(newField, "Aircraft Carrier");
         composeBoard(newField);
-        System.out.println("\nEnter the coordinates of the Battleship (4 cells):");
+        System.out.println("\nEnter the coordinates of the Battleship (4 cells): ");
         processAndFill(newField, "Battleship");
         composeBoard(newField);
-        System.out.println("\nEnter the coordinates of the Submarine (3 cells):");
+        System.out.println("\nEnter the coordinates of the Submarine (3 cells): ");
         processAndFill(newField, "Submarine");
         composeBoard(newField);
-        System.out.println("\nEnter the coordinates of the Cruiser (3 cells):");
+        System.out.println("\nEnter the coordinates of the Cruiser (3 cells): ");
         processAndFill(newField, "Cruiser");
         composeBoard(newField);
-        System.out.println("\nEnter the coordinates of the Destroyer (2 cells):");
+        System.out.println("\nEnter the coordinates of the Destroyer (2 cells): ");
         processAndFill(newField, "Destroyer");
         composeBoard(newField);
-
+        System.out.println("\nThe game starts!\n");
+        composeBoard(newField);
+        System.out.println("\nTake a shot!\n");
+        shootAndAnalyze(newField);
+        composeBoard(newField);
     }
 
+    // Checks input and writes
     public static void processAndFill(BattleField newField, String ship) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
         FileWriter bf = new FileWriter("battlefield", true);
@@ -192,14 +197,14 @@ public class Main {
                         // Need to break form while loop if everything ok: while(false)
                         break;
                     } else {
-                        System.out.println("Error! You placed it too close to another one. Try again: ");
+                        System.out.println("\nError! You placed it too close to another one. Try again:\n");
                         // continue;
                     }
                 } else {
-                    System.out.println("Error! Wrong length of the " + ship + "! " + "Try again:");
+                    System.out.println("\nError! Wrong length of the " + ship + "! " + "Try again:\n");
                 }
             } catch (Exception e) {
-                System.out.println("Error! " + e.getMessage());
+                System.out.println("\nError! " + e.getMessage() + "\n");
             }
         }
         // Inserts manual numbers into array
@@ -218,6 +223,7 @@ public class Main {
         boardWriter.close();
     }
 
+    //Checking space for ships placement
     public static boolean isSpaceAvailable(BattleField newField) {
 /*      System.out.println(shipLength);
         System.out.print(getFirstRowNumber());
@@ -269,7 +275,51 @@ public class Main {
             }
         }
         return true;
+    }
 
+    // Shoot method
+    public static void shootAndAnalyze(BattleField newField) throws IOException {
+        CharArrayWriter boardWriter = new CharArrayWriter();
+        FileWriter bf = new FileWriter("battlefield", true);
+        // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Scanner input = new Scanner(System.in); // For text use Scanner
+        while (true) {
+            try {
+                String[] string = new String[2];
+                String line = input.nextLine();
+
+                string[0] = line.substring(0, 1);
+                string[1] = line.substring(1);
+
+                if (string[1].length() <= 2
+                        && string[0].charAt(0) > 64
+                        && string[0].charAt(0) < 75
+                        && Integer.parseInt(string[1]) >= 1
+                        && Integer.parseInt(string[1]) <= 10) {
+
+                    char firstLetter = string[0].charAt(0);
+                    setFirstRowNumber((int) firstLetter - 64);
+                    setFirstColNumber(Integer.parseInt(string[1]));
+                    break;
+                } else {
+                    System.out.println("Error! You entered the wrong coordinates!. Try again: ");
+                }
+            } catch (Exception e) {
+                System.out.println("Error! " + e.getMessage());
+            }
+        }
+        if (newField.battleField[getFirstRowNumber()][getFirstColNumber()] == cell) {
+            newField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
+            boardWriter.write(newField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            System.out.println("\nYou hit a ship!\n");
+        } else {
+            newField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
+            boardWriter.write(newField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            System.out.println("\nYou missed!\n");
+        }
+        boardWriter.writeTo(bf);
+        bf.close();
+        boardWriter.close();
     }
 
     // Creates new board full of "Fog of War"
@@ -306,7 +356,7 @@ class BattleField {
 
     public BattleField(String name) {
         this.name = name;
-        battleField = new String[][] {
+        battleField = new String[][]{
                 {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
                 {"A", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
                 {"B", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
