@@ -24,7 +24,7 @@ import java.util.Scanner;
 public class Main {
     static String fogOfWar = "~";
     static String cell = "O";
-    static String hit = "x";
+    static String hit = "X";
     static String miss = "M";
     static String newLine = "\n";
     static private int shipLength;
@@ -111,34 +111,35 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         // Write your code here
-        BattleField newField = new BattleField("newone");
-        composeBoard(newField);
+        BattleField myField = new BattleField("newone");
+        BattleField fogField = new BattleField("fogfield");
+        printBoard(myField);
         System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells): ");
-        processAndFill(newField, "Aircraft Carrier");
-        composeBoard(newField);
+        placeShips(myField, "Aircraft Carrier");
+        printBoard(myField);
         System.out.println("\nEnter the coordinates of the Battleship (4 cells): ");
-        processAndFill(newField, "Battleship");
-        composeBoard(newField);
+        placeShips(myField, "Battleship");
+        printBoard(myField);
         System.out.println("\nEnter the coordinates of the Submarine (3 cells): ");
-        processAndFill(newField, "Submarine");
-        composeBoard(newField);
+        placeShips(myField, "Submarine");
+        printBoard(myField);
         System.out.println("\nEnter the coordinates of the Cruiser (3 cells): ");
-        processAndFill(newField, "Cruiser");
-        composeBoard(newField);
+        placeShips(myField, "Cruiser");
+        printBoard(myField);
         System.out.println("\nEnter the coordinates of the Destroyer (2 cells): ");
-        processAndFill(newField, "Destroyer");
-        composeBoard(newField);
+        placeShips(myField, "Destroyer");
+        printBoard(myField);
         System.out.println("\nThe game starts!\n");
-        composeBoard(newField);
+        printBoard(fogField);
         System.out.println("\nTake a shot!\n");
-        shootAndAnalyze(newField);
-        composeBoard(newField);
+        shootAndAnalyze(myField, fogField);
+        printBoard(myField);
     }
 
     // Checks input and writes
-    public static void processAndFill(BattleField newField, String ship) throws IOException {
+    public static void placeShips(BattleField myField, String ship) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield", true);
+        FileWriter myFieldFileWriter = new FileWriter("battlefield", true);
         // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Scanner input = new Scanner(System.in); // For text use Scanner
         while (true) {
@@ -193,7 +194,7 @@ public class Main {
                         && getSecondColNumber() <= 10
                 ) {
                     // Check if cells are available
-                    if (isSpaceAvailable(newField)) {
+                    if (isSpaceAvailable(myField)) {
                         // Need to break form while loop if everything ok: while(false)
                         break;
                     } else {
@@ -208,32 +209,32 @@ public class Main {
             }
         }
         // Inserts manual numbers into array
-        // newField.battleField[3][4] = cell;
-        // boardWriter.write(newField.battleField[3][4]);
-        // boardWriter.writeTo(bf);
+        // myField.battleField[3][4] = cell;
+        // boardWriter.write(myField.battleField[3][4]);
+        // boardWriter.writeTo(myFieldFileWriter);
 
         for (int row = getFirstRowNumber(); row <= getSecondRowNumber(); row++) {
             for (int col = getFirstColNumber(); col <= getSecondColNumber(); col++) {
-                newField.battleField[row][col] = cell;
-                boardWriter.write(newField.battleField[row][col]);
+                myField.battleField[row][col] = cell;
+                boardWriter.write(myField.battleField[row][col]);
             }
         }
-        boardWriter.writeTo(bf);
-        bf.close();
+        boardWriter.writeTo(myFieldFileWriter);
+        myFieldFileWriter.close();
         boardWriter.close();
     }
 
     //Checking space for ships placement
-    public static boolean isSpaceAvailable(BattleField newField) {
+    public static boolean isSpaceAvailable(BattleField myField) {
 /*      System.out.println(shipLength);
         System.out.print(getFirstRowNumber());
         System.out.print(getFirstColNumber() + " ");
         System.out.print(getSecondRowNumber());
         System.out.println(getSecondColNumber());
-        System.out.print(newField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
-        System.out.println(newField.battleField[getSecondRowNumber()][getSecondColNumber()]);
+        System.out.print(myField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
+        System.out.println(myField.battleField[getSecondRowNumber()][getSecondColNumber()]);
 */
-        // Reverse numbers if condition is true (its checked if numbers are ok in the processAndFill
+        // Reverse numbers if condition is true (its checked if numbers are ok in the placeShips
         if (getFirstRowNumber() > getSecondRowNumber()) {
             int temp = getSecondRowNumber();
             setSecondRowNumber(getFirstRowNumber());
@@ -268,8 +269,8 @@ public class Main {
 
         for (int row = getMinRowNumber(); row <= getMaxRowNumber(); row++) {
             for (int col = getMinColNumber(); col <= getMaxColNumber(); col++) {
-                // System.out.println(newField.battleField[row][col] + "***" + row + col);
-                if (newField.battleField[row][col].equals(cell)) {
+                // System.out.println(myField.battleField[row][col] + "***" + row + col);
+                if (myField.battleField[row][col].equals(cell)) {
                     return false;
                 }
             }
@@ -278,9 +279,10 @@ public class Main {
     }
 
     // Shoot method
-    public static void shootAndAnalyze(BattleField newField) throws IOException {
+    public static void shootAndAnalyze(BattleField myField, BattleField fogField) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield", true);
+        FileWriter myFieldFileWriter = new FileWriter("myfield", true);
+        FileWriter fogFieldFileWriter = new FileWriter("fogfield", true);
         // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Scanner input = new Scanner(System.in); // For text use Scanner
         while (true) {
@@ -308,31 +310,39 @@ public class Main {
                 System.out.println("Error! " + e.getMessage());
             }
         }
-        if (newField.battleField[getFirstRowNumber()][getFirstColNumber()] == cell) {
-            newField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
-            boardWriter.write(newField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+        if (myField.battleField[getFirstRowNumber()][getFirstColNumber()] == cell) {
+            myField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
+            fogField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
+            boardWriter.write(myField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            boardWriter.write(fogField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            printBoard(fogField);
             System.out.println("\nYou hit a ship!\n");
         } else {
-            newField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
-            boardWriter.write(newField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            myField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
+            fogField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
+            boardWriter.write(myField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            boardWriter.write(fogField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            printBoard(fogField);
             System.out.println("\nYou missed!\n");
         }
-        boardWriter.writeTo(bf);
-        bf.close();
+        boardWriter.writeTo(myFieldFileWriter);
+        boardWriter.writeTo(fogFieldFileWriter);
+        myFieldFileWriter.close();
+        fogFieldFileWriter.close();
         boardWriter.close();
     }
 
     // Creates new board full of "Fog of War"
-    public static void composeBoard(BattleField newField) throws IOException {
+    public static void printBoard(BattleField myField) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield"); // Implement name ask
+        FileWriter myFieldFileWriter = new FileWriter("battlefield"); // Implement name ask
         // System.out.println(notationUpper);
         // boardWriter.write(notationUpper);
         // boardWriter.write(newLine);
         for (int rows = 0; rows < 11; rows++) {
             for (int cols = 0; cols < 11; cols++) {
-                System.out.print(newField.battleField[rows][cols]);
-                boardWriter.write(newField.battleField[rows][cols]);
+                System.out.print(myField.battleField[rows][cols]);
+                boardWriter.write(myField.battleField[rows][cols]);
                 if (cols == 10) {
                     System.out.println();
                     boardWriter.write(newLine);
@@ -343,8 +353,8 @@ public class Main {
             }
         }
         // Write to file and close Writer
-        boardWriter.writeTo(bf);
-        bf.close();
+        boardWriter.writeTo(myFieldFileWriter);
+        myFieldFileWriter.close();
         boardWriter.close();
     }
 }

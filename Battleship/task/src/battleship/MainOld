@@ -112,27 +112,27 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         // Write your code here
-        BattleField newField = new BattleField("newone");
-        composeBoard(newField);
+        BattleField myField = new BattleField("newone");
+        composeBoard(myField);
         System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells):");
-        processAndFill(newField, "Aircraft Carrier");
-        composeBoard(newField);
+        processAndFill(myField, "Aircraft Carrier");
+        composeBoard(myField);
         System.out.println("\nEnter the coordinates of the Battleship (4 cells):");
-        processAndFill(newField, "Battleship");
-        composeBoard(newField);
+        processAndFill(myField, "Battleship");
+        composeBoard(myField);
         System.out.println("\nEnter the coordinates of the Submarine (3 cells):");
-        processAndFill(newField, "Submarine");
-        composeBoard(newField);
+        processAndFill(myField, "Submarine");
+        composeBoard(myField);
         System.out.println("\nEnter the coordinates of the Cruiser (3 cells):");
-        processAndFill(newField, "Cruiser");
-        composeBoard(newField);
+        processAndFill(myField, "Cruiser");
+        composeBoard(myField);
         System.out.println("\nEnter the coordinates of the Destroyer (2 cells):");
-        processAndFill(newField, "Destroyer");
-        composeBoard(newField);
+        processAndFill(myField, "Destroyer");
+        composeBoard(myField);
 
     }
 
-    public static void processAndFill(BattleField newField, String ship) throws IOException {
+    public static void processAndFill(BattleField myField, String ship) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
         FileWriter bf = new FileWriter("battlefield", true);
         // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -187,7 +187,7 @@ public class Main {
                         && getSecondColNumber() <= 10
                 ) {
                     // Check if cells are available
-                    if (isSpaceAvailable(newField, getShipLength())) {
+                    if (isSpaceAvailable(myField, getShipLength())) {
                         // Need to break form while loop if everything ok: while(false)
                         break;
                     } else {
@@ -202,14 +202,14 @@ public class Main {
             }
         }
         // Inserts manual numbers into array
-        // newField.battleField[3][4] = cell;
-        // boardWriter.write(newField.battleField[3][4]);
+        // myField.battleField[3][4] = cell;
+        // boardWriter.write(myField.battleField[3][4]);
         // boardWriter.writeTo(bf);
 
         for (int row = getFirstRowNumber(); row <= getSecondRowNumber(); row++) {
             for (int col = getFirstColNumber(); col <= getSecondColNumber(); col++) {
-                newField.battleField[row][col] = cell;
-                boardWriter.write(newField.battleField[row][col]);
+                myField.battleField[row][col] = cell;
+                boardWriter.write(myField.battleField[row][col]);
             }
         }
         boardWriter.writeTo(bf);
@@ -217,14 +217,14 @@ public class Main {
         boardWriter.close();
     }
 
-    public static boolean isSpaceAvailable(BattleField newField, int shipLength) {
+    public static boolean isSpaceAvailable(BattleField myField, int shipLength) {
 /*        System.out.println(shipLength);
         System.out.print(getFirstRowNumber());
         System.out.print(getFirstColNumber() + " ");
         System.out.print(getSecondRowNumber());
         System.out.println(getSecondColNumber());
-        System.out.print(newField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
-        System.out.println(newField.battleField[getSecondRowNumber()][getSecondColNumber()]);
+        System.out.print(myField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
+        System.out.println(myField.battleField[getSecondRowNumber()][getSecondColNumber()]);
 */
 
         if (getFirstColNumber() == 1) {
@@ -252,8 +252,8 @@ public class Main {
 
         for (int row = getMinRowNumber(); row <= getMaxRowNumber(); row++) {
             for (int col = getMinColNumber(); col <= getMaxColNumber(); col++) {
-                // System.out.println(newField.battleField[row][col] + "***" + row + col);
-                if (newField.battleField[row][col] == cell) {
+                // System.out.println(myField.battleField[row][col] + "***" + row + col);
+                if (myField.battleField[row][col] == cell) {
                     return false;
                 }
             }
@@ -263,7 +263,7 @@ public class Main {
     }
 
     // Creates new board full of 'Fog of War'
-    public static void composeBoard(BattleField newField) throws IOException {
+    public static void composeBoard(BattleField myField) throws IOException {
         CharArrayWriter boardWriter = new CharArrayWriter();
         FileWriter bf = new FileWriter("battlefield"); // Implement name ask
         System.out.println(notationUpper);
@@ -271,8 +271,8 @@ public class Main {
         boardWriter.write(newLine);
         for (int rows = 0; rows < 10; rows++) {
             for (int cols = 0; cols < 11; cols++) {
-                System.out.print(newField.battleField[rows][cols]);
-                boardWriter.write(newField.battleField[rows][cols]);
+                System.out.print(myField.battleField[rows][cols]);
+                boardWriter.write(myField.battleField[rows][cols]);
                 if (cols == 10) {
                     System.out.println();
                     boardWriter.write(newLine);

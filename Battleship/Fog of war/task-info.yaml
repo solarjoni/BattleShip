@@ -1312,6 +1312,15 @@ files:
 - name: ../task/src/battleship/MainOld
   visible: true
   learner_created: true
+- name: fogfield
+  visible: true
+  learner_created: true
+- name: myfield
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/125/stages/665/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 24 Mar 2021 14:08:12 UTC
 record: -1
