@@ -1,11 +1,11 @@
 /*
     In this stage, you should arrange your ships on the game field.
-    Before you start, let's discuss the conventions of the game:
+    Before you start, let"s discuss the conventions of the game:
 
     On a 10x10 field, the first row should contain numbers from 1 to 10 indicating the column,
     and the first column should contain letters from A to J indicating the row.
     The symbol ~ denotes the fog of war: the unknown area on the
-    opponent's field and the yet untouched area on your field.
+    opponent"s field and the yet untouched area on your field.
     The symbol O denotes a cell with your ship, X denotes that
     the ship was hit, and M signifies a miss.
     You have 5 ships: Aircraft Carrier is 5 cells, Battleship is 4 cells,
@@ -22,12 +22,11 @@ import java.io.*;
 import java.util.Scanner;
 
 public class Main {
-    static char fogOfWar = '~';
-    static char cell = 'o';
-    static char hit = 'x';
-    static char miss = 'M';
+    static String fogOfWar = "~";
+    static String cell = "O";
+    static String hit = "X";
+    static String miss = "M";
     static String newLine = "\n";
-    static String notationUpper = "  1 2 3 4 5 6 7 8 9 10";
     static private int shipLength;
     static private int firstRowNumber;
     static private int firstColNumber;
@@ -112,29 +111,29 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         // Write your code here
-        BattleField myField = new BattleField("newone");
-        composeBoard(myField);
-        System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells):");
-        processAndFill(myField, "Aircraft Carrier");
-        composeBoard(myField);
-        System.out.println("\nEnter the coordinates of the Battleship (4 cells):");
-        processAndFill(myField, "Battleship");
-        composeBoard(myField);
-        System.out.println("\nEnter the coordinates of the Submarine (3 cells):");
-        processAndFill(myField, "Submarine");
-        composeBoard(myField);
-        System.out.println("\nEnter the coordinates of the Cruiser (3 cells):");
-        processAndFill(myField, "Cruiser");
-        composeBoard(myField);
-        System.out.println("\nEnter the coordinates of the Destroyer (2 cells):");
-        processAndFill(myField, "Destroyer");
-        composeBoard(myField);
-
+        BattleField myField = new BattleField("myfield");
+        BattleField fogField = new BattleField("fogfield");
+        printBoard(myField, "myfield");
+        System.out.println("\nEnter the coordinates of the Aircraft Carrier (5 cells): ");
+        placeShips(myField, "Aircraft Carrier");
+        System.out.println("\nEnter the coordinates of the Battleship (4 cells): ");
+        placeShips(myField, "Battleship");
+        System.out.println("\nEnter the coordinates of the Submarine (3 cells): ");
+        placeShips(myField, "Submarine");
+        System.out.println("\nEnter the coordinates of the Cruiser (3 cells): ");
+        placeShips(myField, "Cruiser");
+        System.out.println("\nEnter the coordinates of the Destroyer (2 cells): ");
+        placeShips(myField, "Destroyer");
+        System.out.println("\nThe game starts!\n");
+        printBoard(fogField, "fogfield");
+        System.out.println("\nTake a shot!\n");
+        shootAndAnalyze(myField, fogField);
     }
 
-    public static void processAndFill(BattleField myField, String ship) throws IOException {
-        CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield", true);
+    // Checks input and writes
+    public static void placeShips(BattleField myField, String ship) throws IOException {
+        CharArrayWriter myFieldCharWriter = new CharArrayWriter();
+        FileWriter myFieldFileWriter = new FileWriter("myfield", true);
         // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Scanner input = new Scanner(System.in); // For text use Scanner
         while (true) {
@@ -145,8 +144,8 @@ public class Main {
 
                 char firstLetter = stringsArray[0].charAt(0);
                 char secondLetter = stringsArray[1].charAt(0);
-                setFirstRowNumber((int) firstLetter - 65);
-                setSecondRowNumber((int) secondLetter - 65);
+                setFirstRowNumber((int) firstLetter - 64);
+                setSecondRowNumber((int) secondLetter - 64);
                 setFirstColNumber(Integer.parseInt(stringsArray[0].substring(1)));
                 setSecondColNumber(Integer.parseInt(stringsArray[1].substring(1)));
 
@@ -169,56 +168,61 @@ public class Main {
                 }
                 // Checks if input is correct
                 if (stringsArray.length == 2
-                        && stringsArray[0].length() <= 3
+                        && stringsArray[0].length() <= 3 // i.e A1 or A10
                         && stringsArray[1].length() <= 3
                         &&
                         (getFirstRowNumber() == getSecondRowNumber()
                                 || getFirstColNumber() == getSecondColNumber())
                         && (getSecondRowNumber() - getFirstRowNumber() == getShipLength() - 1
-                        || getSecondColNumber() - getFirstColNumber() == getShipLength() - 1)
+                        || getSecondColNumber() - getFirstColNumber() == getShipLength() - 1
+                        || getFirstRowNumber() - getSecondRowNumber() == getShipLength() - 1
+                        || getFirstColNumber() - getSecondColNumber() == getShipLength() - 1)
                         // Its possible for a second number be less than first!
-                        && firstRowNumber >= 0 // is true anyway ?
-                        && getFirstRowNumber() <= 9
+                        && firstRowNumber >= 1 // is true anyway ?
+                        && getFirstRowNumber() <= 10
                         && getFirstColNumber() >= 1
                         && getFirstColNumber() <= 10
-                        && secondRowNumber >= 0 // is true anyway ?
-                        && getSecondRowNumber() <= 9
+                        && secondRowNumber >= 1 // is true anyway ?
+                        && getSecondRowNumber() <= 10
                         && getSecondColNumber() >= 1
                         && getSecondColNumber() <= 10
                 ) {
                     // Check if cells are available
-                    if (isSpaceAvailable(myField, getShipLength())) {
+                    if (isSpaceAvailable(myField)) {
                         // Need to break form while loop if everything ok: while(false)
                         break;
                     } else {
-                        System.out.println("Error. Space not available");
+                        System.out.println("\nError! You placed it too close to another one. Try again:\n");
                         // continue;
                     }
                 } else {
-                    System.out.println("Error! Numbers not Ok");
+                    System.out.println("\nError! Wrong length of the " + ship + "! " + "Try again:\n");
                 }
             } catch (Exception e) {
-                System.out.println("Error " + e.getMessage());
+                System.out.println("\nError! " + e.getMessage() + "\n");
             }
         }
         // Inserts manual numbers into array
         // myField.battleField[3][4] = cell;
-        // boardWriter.write(myField.battleField[3][4]);
-        // boardWriter.writeTo(bf);
+        // myFieldCharWriter.write(myField.battleField[3][4]);
+        // myFieldCharWriter.writeTo(myFieldFileWriter);
 
         for (int row = getFirstRowNumber(); row <= getSecondRowNumber(); row++) {
             for (int col = getFirstColNumber(); col <= getSecondColNumber(); col++) {
                 myField.battleField[row][col] = cell;
-                boardWriter.write(myField.battleField[row][col]);
+                myFieldCharWriter.write(myField.battleField[row][col]);
             }
         }
-        boardWriter.writeTo(bf);
-        bf.close();
-        boardWriter.close();
+        myFieldCharWriter.writeTo(myFieldFileWriter);
+        myFieldFileWriter.close();
+        myFieldCharWriter.close();
+        System.out.println();
+        printBoard(myField, "myfield");
     }
 
-    public static boolean isSpaceAvailable(BattleField myField, int shipLength) {
-/*        System.out.println(shipLength);
+    //Checking space for ships placement
+    public static boolean isSpaceAvailable(BattleField myField) {
+/*      System.out.println(shipLength);
         System.out.print(getFirstRowNumber());
         System.out.print(getFirstColNumber() + " ");
         System.out.print(getSecondRowNumber());
@@ -226,19 +230,30 @@ public class Main {
         System.out.print(myField.battleField[getFirstRowNumber()][getFirstColNumber()] + " ");
         System.out.println(myField.battleField[getSecondRowNumber()][getSecondColNumber()]);
 */
+        // Reverse numbers if condition is true (its checked if numbers are ok in the placeShips
+        if (getFirstRowNumber() > getSecondRowNumber()) {
+            int temp = getSecondRowNumber();
+            setSecondRowNumber(getFirstRowNumber());
+            setFirstRowNumber(temp);
+        }
+        if (getFirstColNumber() > getSecondColNumber()) {
+            int temp = getSecondColNumber();
+            setSecondColNumber(getFirstColNumber());
+            setFirstColNumber(temp);
+        }
 
         if (getFirstColNumber() == 1) {
             setMinColNumber(1);
         } else {
             setMinColNumber(getFirstColNumber() - 1);
         }
-        if (getFirstRowNumber() == 0) {
-            setMinRowNumber(0);
+        if (getFirstRowNumber() == 1) {
+            setMinRowNumber(1);
         } else {
             setMinRowNumber(getFirstRowNumber() - 1);
         }
-        if (getSecondRowNumber() == 9) {
-            setMaxRowNumber(9);
+        if (getSecondRowNumber() == 10) {
+            setMaxRowNumber(10);
         } else {
             setMaxRowNumber(getSecondRowNumber() + 1);
         }
@@ -246,67 +261,127 @@ public class Main {
             setMaxColNumber(10);
         } else {
             setMaxColNumber(getSecondColNumber() + 1);
-
         }
-
 
         for (int row = getMinRowNumber(); row <= getMaxRowNumber(); row++) {
             for (int col = getMinColNumber(); col <= getMaxColNumber(); col++) {
                 // System.out.println(myField.battleField[row][col] + "***" + row + col);
-                if (myField.battleField[row][col] == cell) {
+                if (myField.battleField[row][col].equals(cell)) {
                     return false;
                 }
             }
         }
         return true;
-
     }
 
-    // Creates new board full of 'Fog of War'
-    public static void composeBoard(BattleField myField) throws IOException {
-        CharArrayWriter boardWriter = new CharArrayWriter();
-        FileWriter bf = new FileWriter("battlefield"); // Implement name ask
-        System.out.println(notationUpper);
-        boardWriter.write(notationUpper);
-        boardWriter.write(newLine);
-        for (int rows = 0; rows < 10; rows++) {
+    // Shoot method
+    public static void shootAndAnalyze(BattleField myField, BattleField fogField) throws IOException {
+        CharArrayWriter myFieldCharWriter = new CharArrayWriter();
+        CharArrayWriter fogFieldCharWriter = new CharArrayWriter();
+        FileWriter myFieldFileWriter = new FileWriter("myfield", true);
+        FileWriter fogFieldFileWriter = new FileWriter("fogfield", true);
+        // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Scanner input = new Scanner(System.in); // For text use Scanner
+        while (true) {
+            try {
+                String[] string = new String[2];
+                String line = input.nextLine();
+
+                string[0] = line.substring(0, 1);
+                string[1] = line.substring(1);
+
+                if (string[1].length() <= 2
+                        && string[0].charAt(0) > 64
+                        && string[0].charAt(0) < 75
+                        && Integer.parseInt(string[1]) >= 1
+                        && Integer.parseInt(string[1]) <= 10) {
+
+                    char firstLetter = string[0].charAt(0);
+                    setFirstRowNumber((int) firstLetter - 64);
+                    setFirstColNumber(Integer.parseInt(string[1]));
+                    break;
+                } else {
+                    System.out.println("Error! You entered the wrong coordinates!. Try again: ");
+                }
+            } catch (Exception e) {
+                System.out.println("Error! " + e.getMessage());
+            }
+        }
+        if (cell.equals(myField.battleField[getFirstRowNumber()][getFirstColNumber()])) {
+            myField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
+            fogField.battleField[getFirstRowNumber()][getFirstColNumber()] = hit;
+            myFieldCharWriter.write(myField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            fogFieldCharWriter.write(fogField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            System.out.println();
+            printBoard(fogField, "fogfield");
+            System.out.println("\nYou hit a ship!\n");
+            printBoard(myField, "myfield");
+
+        } else {
+            myField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
+            fogField.battleField[getFirstRowNumber()][getFirstColNumber()] = miss;
+            myFieldCharWriter.write(myField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            fogFieldCharWriter.write(fogField.battleField[getFirstRowNumber()][getFirstColNumber()]);
+            System.out.println();
+            printBoard(fogField, "fogfield");
+            System.out.println("\nYou missed!\n");
+            printBoard(myField, "myfield");
+
+        }
+        myFieldCharWriter.writeTo(myFieldFileWriter);
+        fogFieldCharWriter.writeTo(fogFieldFileWriter);
+        myFieldFileWriter.close();
+        fogFieldFileWriter.close();
+        myFieldCharWriter.close();
+        fogFieldCharWriter.close();
+    }
+
+    // Creates new board full of "Fog of War"
+    public static void printBoard(BattleField field, String fileName) throws IOException {
+        CharArrayWriter fieldCharWriter = new CharArrayWriter();
+        FileWriter fieldFileWriter = new FileWriter(fileName); // Implement name ask
+        // System.out.println(notationUpper);
+        // myFieldCharWriter.write(notationUpper);
+        // myFieldCharWriter.write(newLine);
+        for (int rows = 0; rows < 11; rows++) {
             for (int cols = 0; cols < 11; cols++) {
-                System.out.print(myField.battleField[rows][cols]);
-                boardWriter.write(myField.battleField[rows][cols]);
+                System.out.print(field.battleField[rows][cols]);
+                fieldCharWriter.write(field.battleField[rows][cols]);
                 if (cols == 10) {
                     System.out.println();
-                    boardWriter.write(newLine);
+                    fieldCharWriter.write(newLine);
                 } else {
-                    System.out.print(' ');
-                    boardWriter.write(' ');
+                    System.out.print(" ");
+                    fieldCharWriter.write(" ");
                 }
             }
         }
         // Write to file and close Writer
-        boardWriter.writeTo(bf);
-        bf.close();
-        boardWriter.close();
+        fieldCharWriter.writeTo(fieldFileWriter);
+        fieldFileWriter.close();
+        fieldCharWriter.close();
     }
 }
 
 
 class BattleField {
     String name;
-    char[][] battleField;
+    String[][] battleField;
 
     public BattleField(String name) {
         this.name = name;
-        battleField = new char[][] {
-                {'A', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'B', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'C', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'D', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'E', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'F', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'G', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'H', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'I', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
-                {'J', '~', '~', '~', '~', '~', '~', '~', '~', '~', '~'},
+        battleField = new String[][]{
+                {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+                {"A", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"B", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"C", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"D", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"E", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"F", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"G", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"H", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"I", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
+                {"J", "~", "~", "~", "~", "~", "~", "~", "~", "~", "~"},
         };
     }
 }
