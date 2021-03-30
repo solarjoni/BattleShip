@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.Scanner;
 
 public class Main {
-    static String fogOfWar = "~";
+    // static String fogOfWar = "~";
     static String cell = "O";
     static String hit = "X";
     static String miss = "M";
@@ -341,6 +341,7 @@ public class Main {
         }
 
         Scanner input = new Scanner(System.in); // For text use Scanner
+
         while (getHitCount1() <= 16 || getHitCount2() <= 16) {
             while (true) {
                 try {
@@ -409,9 +410,7 @@ public class Main {
                     setMaxColNumber(getFirstColNumber() + 1);
                 }
 
-                /*
-                    Check if there are cells around
-                 */
+                //   Check if there are cells around
                 if (cell.equals(enemy.battleField[getMaxRowNumber()][getFirstColNumber()])
                         || cell.equals(enemy.battleField[getFirstRowNumber()][getMaxColNumber()])
                         || cell.equals(enemy.battleField[getMinRowNumber()][getFirstColNumber()])
@@ -427,21 +426,16 @@ public class Main {
                     }
                     break;
 
-
                 } else {
                     System.out.println();
                     printBoard(fogField, fogField.name);
                     System.out.println("---------------------");
                     printBoard(own, own.name);
                     System.out.println("\nYou sank a ship!\n");
-                    if (
-
-                            getHitCount1() == 17) {
+                    if (getHitCount1() == 17) {
                         System.out.println("Player 1, you sank the last ship. You won. Congratulations!\n");
                         break;
-                    } else if (
-
-                            getHitCount2() == 17) {
+                    } else if (getHitCount2() == 17) {
                         System.out.println("Player 2, you sank the last ship. You won. Congratulations!\n");
                         break;
                     }
@@ -451,7 +445,6 @@ public class Main {
                     }
                     break;
                 }
-
                 // printBoard(fogField, "fogfield");
                 // printBoard(myField, "myfield");
             } else {
@@ -476,8 +469,6 @@ public class Main {
             // fogFieldFileWriter.close();
             // charWriter.close();
         }
-
-
     }
 
     /* Prints board */
@@ -528,7 +519,7 @@ class BattleField {
         };
     }
 }
-
+/*
 abstract class Ship {
 
 }
@@ -563,3 +554,4 @@ class Cruiser extends Ship {
 class Destroyer extends Ship {
     private final int deck = 2;
 }
+*/
